@@ -6,26 +6,93 @@
 
 #header > div.column-left {
     flex: 1;
+    font-size: 24px;
 }
 
 #header > div.column-right {
     flex: 1;
     display: flex;
     flex-direction: row;
+    justify-content: flex-end;
+    font-size: 18px;
+    font-weight: bold;
 }
 
 #header > div.column-right > div {
-    margin-right: 10px;
+    margin: 10px;
+    color: #000000;
+    text-decoration: none;
+    border-bottom: 2px solid transparent;
+    transition: border-bottom 1.0s ease, box-shadow 0.5s ease;
+    transition: rgba(0, 0, 0, 0.1) 0 4px 12px 0.5s ease;
 }
 
-#header > div.column-right > div:nth-child(2) {
-    padding-left: 10px;
-    padding-right: 10px;
-    border-left: 1px solid black;
-    border-right: 1px solid black;
+#header > div.column-right > div:hover {
+    color: #317a24b7;
+    border-bottom: 2px solid #000000;
+    cursor: pointer;
+    box-shadow: rgba(0, 0, 0, 0.1) 0 4px 12px;
+}
+
+hr.vertical-hr {
+    width: 1px;
+    height: 100%;
+    border: none;
+    background-color: #000000;
+    margin: 0;
+    padding: 0;
 }
 
 /* Intro styles */
+#intro {
+    text-align: center;
+}
+
+#intro > #title {
+    margin-top: 3%;
+}
+
+#intro > #about-title {
+    margin-top: 2%;
+}
+
+#intro > div > p {
+    margin-left: 22.5%;
+    width: 55%;
+}
+
+#intro > #navigation {
+    margin-left: 25%;
+    width: 50%;
+    display: flex;
+    justify-content: space-between;
+}
+
+#intro > #navigation > div {
+    border: 2px solid black;
+    border-radius: 5%;
+    margin: 5%;
+    width: 16%;
+    padding: 25px;
+}
+
+#intro > #navigation > div {
+    background-color: #aff8a2;
+    transition: background-color 0.5s;
+    font-weight: bold;
+    color: #000000;
+    box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+}
+
+#intro > #navigation > div:hover {
+    background-color: #ffffff;
+    cursor: pointer;
+}
+
+#content img {
+    width: 400px;
+    border-radius: 50%;
+}
 
 /* Career styles */
 
@@ -34,6 +101,12 @@
 /* Get in touch styles */
 
 /* Footer styles */
+hr {
+    margin-top: 7%;
+    margin-bottom: 3%;
+    width: 90%;
+}
+
 #footer > div.column {
     width: 25%; /* Each column takes up 25% of the container's width */
     float: left; /* Float the columns to make them appear side by side */

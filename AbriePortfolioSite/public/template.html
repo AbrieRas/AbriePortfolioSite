@@ -3,26 +3,39 @@
     <head>
         <title>Abrie Portfolio Site</title>
         <link rel="stylesheet" href="./styles.css">
+        <!-- Implement Vue with defer here -->
+        <script src="./app.js" defer></script>
     </head>
 
     <body>
         <div id="header">
-            <div id="column-left">
+            <div class="column-left">
                 <div><img src="./Circle.png" width="10px"/><strong>Abrie Ras</strong></div>
             </div>
 
-            <div id="column-right">
-                <div><span>Career</span></div>
-                <div><span>Repositories</span></div>
-                <div><span>Get in touch</span></div>
+            <div class="column-right">
+                <div class="career">Career</div>
+                <hr class="vertical-hr"/>
+                <div class="repositories">Repositories</div>
+                <hr class="vertical-hr"/>
+                <div class="get-in-touch">Get in touch</div>
             </div>
         </div>
 
         <div id="content">
             <div id="intro">
-                <div class="column-left"></div>
-
-                <div class="column-left"></div>
+                <div id="title"><h1>Full Stack Developer</h1></div>
+                <div><img src="./Self.bmp"/></div>
+                <div id="about-title"><h3>About me</h3></div>
+                <div><p>I am a dedicated software engineer, specializing in full-stack web development. 
+                    With a track record of delivering high-quality service and a passion for technology, 
+                    I am driven to tackle complex challenges and continuously evolving and growing in my 
+                    role as a software engineer.</p></div>
+                <div id="navigation">
+                    <div class="career">Career</div>
+                    <div class="repositories">Repositories</div>
+                    <div class="get-in-touch">Get in touch</div>
+                </div>
             </div>
 
             <div id="career">
@@ -43,6 +56,8 @@
                 <div class="column-left"></div>
             </div>
         </div>
+
+        <hr/>
 
         <div id="footer">
             <div class="column">
