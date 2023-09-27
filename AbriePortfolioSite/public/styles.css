@@ -94,6 +94,13 @@ hr.vertical-hr {
     border-radius: 50%;
 }
 
+/* Career, Repositories and Get in touch styles */
+#career > div.column-left,
+#repositories > div.column-left,
+#get-in-touch > div.column-left {
+    margin-left: 5%;
+}
+
 /* Career styles */
 
 /* Repositories styles */
