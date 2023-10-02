@@ -102,6 +102,38 @@ hr.vertical-hr {
 }
 
 /* Career styles */
+#career {
+    display: flex;
+    justify-content: space-between;
+    margin: 0 auto;
+}
+
+#career > div {
+    flex: 1;
+}
+
+#career > div:nth-child(2n-1) {
+    text-align: left;
+}
+
+#career > div:nth-child(2) {
+    text-align: right;
+    margin-right: 2%;
+}
+
+#career > div:nth-child(n+2) {
+    margin-top: 5%;
+}
+
+#career > div:last-child {
+    max-width: 40%;
+    margin-right: 5%;
+    flex: 2;
+}
+
+#career > div > p {
+    margin-top: 2%;
+}
 
 /* Repositories styles */
 
