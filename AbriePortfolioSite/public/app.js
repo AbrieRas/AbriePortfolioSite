@@ -11,11 +11,13 @@ const hrefTo = (src) => {
 // Add event listeners
 (()=>{
     const careerClasses = document.querySelectorAll('.career');
+    const achievementsClasses = document.querySelectorAll('.achievements');
     const repositoriesClasses = document.querySelectorAll('.repositories');
     const getInTouchClasses = document.querySelectorAll('.get-in-touch');
     
     for(let i = 0; i < careerClasses.length; i++) {
         careerClasses[i].addEventListener('click', () => { hrefTo('career'); });
+        achievementsClasses[i].addEventListener('click', () => { hrefTo('achievements'); });
         repositoriesClasses[i].addEventListener('click', () => { hrefTo('repositories'); });
         getInTouchClasses[i].addEventListener('click', () => { hrefTo('get-in-touch'); });
     }
