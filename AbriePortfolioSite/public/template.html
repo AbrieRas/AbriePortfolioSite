@@ -8,9 +8,11 @@
     </head>
 
     <body>
+        <div id="back-to-top">&#8593;</div>
+
         <div id="header">
             <div class="column-left">
-                <div><img src="./Circle.png" width="10px"/><strong>Abrie Ras</strong></div>
+                <div><img src="./Circle.png" width="10px"/>oast; <strong>Abrie Ras</strong></div>
             </div>
 
             <div class="column-right">
@@ -112,24 +114,24 @@
                     <form id="email-form" class="column-right" action="/email-message">
                         <div class="inner-column-left">
                             <label for="name">Name</label>
-                            <input id="name" name="name" type="text"/>
+                            <input id="name" name="name" type="text" autocomplete="name" tabindex="1"/>
                             
                             <label for="email">Email *</label>
-                            <input id="email" name="email" type="text"/>
+                            <input id="email" name="email" type="text" autocomplete="email" tabindex="3"/>
                         </div>
 
                         <div class="inner-column-right">
                             <label for="surname">Surname</label>
-                            <input id="surname" name="surname" type="text"/>
+                            <input id="surname" name="surname" type="text" tabindex="2"/>
                             
                             <label for="subject">Subject</label>
-                            <input id="subject" name="subject" type="text"/>
+                            <input id="subject" name="subject" type="text" tabindex="4"/>
                         </div>
                         
                         <label for="message">Message</label>
-                        <textarea id="message" name="message"></textarea>
+                        <textarea id="message" name="message" tabindex="5"></textarea>
                         
-                        <div id="submit" class="theme-button">Send</div>
+                        <div id="submit" class="theme-button" tabindex="6">Send</div>
                     </form>
                 </div>
             </div>

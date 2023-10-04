@@ -13,7 +13,8 @@ div.theme-button {
     box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
 }
 
-div.theme-button:hover {
+div.theme-button:hover,
+div.theme-button:focus {
     background-color: #ffffff;
     cursor: pointer;
 }
@@ -31,6 +32,21 @@ hr.vertical-hr {
     background-color: #000000;
     margin: 0;
     padding: 0;
+}
+
+#back-to-top {
+    width: 0px;
+    height: 0px;
+    background-color: #aff8a2;
+    border-radius: 50%;
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    cursor: pointer;
+    text-align: center;
+    font-size: 30px;
+    border: 1px solid black;
+    transition: all 1s ease;
 }
 
 /* Header styles */

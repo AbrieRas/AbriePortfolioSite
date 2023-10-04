@@ -14,6 +14,32 @@ const addSubmitButtonFunctionality = () => {
     });
 };
 
+const addBackToTopButtonFunctionality = () => {
+    var backToTopButton = document.getElementById('back-to-top');
+    var triggerPoint = document.getElementById('career'); // Career id
+
+    // Show/hide the floating circle based on scroll position
+    window.addEventListener('scroll', function() {
+        if (window.scrollY >= triggerPoint.offsetTop) {
+            // Make the circle visible and restore its original size
+            backToTopButton.style.opacity = '1';
+            backToTopButton.style.width = '50px';
+            backToTopButton.style.height = '50px';
+            backToTopButton.style.fontSize = '30px';
+        } else {
+            backToTopButton.style.opacity = '0';
+            backToTopButton.style.width = '0px';
+            backToTopButton.style.height = '0px';
+            backToTopButton.style.fontSize = '0px';
+        }
+    });
+
+    // Scroll to the top when the floating circle is clicked
+    backToTopButton.addEventListener('click', () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+};
+
 // Add event listeners
 (()=>{
     const careerClasses = document.querySelectorAll('.career');
@@ -29,4 +55,5 @@ const addSubmitButtonFunctionality = () => {
     }
     
     addSubmitButtonFunctionality();
+    addBackToTopButtonFunctionality();
 })();
