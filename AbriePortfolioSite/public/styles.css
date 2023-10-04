@@ -177,7 +177,7 @@ hr.vertical-hr {
     margin: 12% auto 3%;
 }
 
-#get-in-touch-body > div.column-right {
+#get-in-touch-body > form.column-right {
     text-align: center;
     width: 40%;
 }
@@ -193,14 +193,16 @@ hr.vertical-hr {
     margin-left: 2%;
 }
 
-#get-in-touch-body input,
-textarea#message {
+#get-in-touch-body input {
     width: 90%;
     padding: 3%;
     margin-bottom: 8%;
 }
 
 textarea#message {
+    width: 94%;
+    padding: 1%;
+    font-size: 16px;
     margin-bottom: 5%;
 }
 
@@ -223,4 +225,5 @@ textarea#message {
     margin: 5px;
     border: 1px solid #ccc;
     text-align: center;
+    border-radius: 10px;
 }

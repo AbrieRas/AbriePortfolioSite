@@ -109,29 +109,28 @@
                             <div><a href="tel:27799489329" target="_blank">+27 79 948 9329</a></div>
                         </div>
                     </div>
-
-                    <div class="column-right">
+                    <form id="email-form" class="column-right" action="/email-message">
                         <div class="inner-column-left">
                             <label for="name">Name</label>
-                            <input id="name" type="text"/>
+                            <input id="name" name="name" type="text"/>
                             
                             <label for="email">Email *</label>
-                            <input id="email" type="text"/>
+                            <input id="email" name="email" type="text"/>
                         </div>
 
                         <div class="inner-column-right">
                             <label for="surname">Surname</label>
-                            <input id="surname" type="text"/>
+                            <input id="surname" name="surname" type="text"/>
                             
                             <label for="subject">Subject</label>
-                            <input id="subject" type="text"/>
+                            <input id="subject" name="subject" type="text"/>
                         </div>
                         
                         <label for="message">Message</label>
                         <textarea id="message" name="message"></textarea>
                         
                         <div id="submit" class="theme-button">Send</div>
-                    </div>
+                    </form>
                 </div>
             </div>
         </div>

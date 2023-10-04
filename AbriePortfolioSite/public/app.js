@@ -8,6 +8,12 @@ const hrefTo = (src) => {
     }
 };
 
+const addSubmitButtonFunctionality = () => {
+    document.getElementById('submit').addEventListener('click', () => {
+        document.getElementById('email-form').submit();
+    });
+};
+
 // Add event listeners
 (()=>{
     const careerClasses = document.querySelectorAll('.career');
@@ -21,4 +27,6 @@ const hrefTo = (src) => {
         repositoriesClasses[i].addEventListener('click', () => { hrefTo('repositories'); });
         getInTouchClasses[i].addEventListener('click', () => { hrefTo('get-in-touch'); });
     }
+    
+    addSubmitButtonFunctionality();
 })();
