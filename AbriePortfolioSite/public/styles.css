@@ -49,10 +49,18 @@ hr.vertical-hr {
     transition: all 1s ease;
 }
 
+img.icon {
+    width: 10px;
+}
+
 /* Header styles */
 #header {
     display: flex;
     justify-content: space-between;
+}
+
+#header > div.column-left img.icon {
+    width: 15px;
 }
 
 #header > div.column-left {
@@ -188,6 +196,11 @@ hr.vertical-hr {
     justify-content: space-evenly;
 }
 
+#get-in-touch img.icon {
+    width: 10px;
+    border-radius: 0%;
+}
+
 #get-in-touch-body div#email-box div:first-child,
 #get-in-touch-body div#mobile-box div:first-child {
     margin: 12% auto 3%;
@@ -229,10 +242,10 @@ textarea#message {
 
 /* Footer styles */
 #footer > div.column {
-    width: 25%; /* Each column takes up 25% of the container's width */
-    float: left; /* Float the columns to make them appear side by side */
-    padding: 10px; /* Add some spacing between columns */
-    box-sizing: border-box; /* Include padding and border in the column's total width */
+    width: 25%;
+    float: left;
+    padding: 10px;
+    box-sizing: border-box;
 }
 
 #footer > div.column > div {
