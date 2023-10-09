@@ -1,14 +1,84 @@
+// Imports
+const { openDatabase, closeDatabase } = require('./database.js');
+
 // Helper functions
 const handleRunError = (error) => {
-    response.status(500).send('Internal server error.');
+    if (error) {
+        console.log('Error: ', error);
+    }
+};
+
+/**
+ * Return all data related to a table that is passed in the url
+ * 
+ * @param {string} table - selecting table to retrieve data from in sqlite3 query
+ * @param {response} response - providing feedback to requester
+ */
+const retrieveDataFromTable = (table, response) => {
+    const db = openDatabase();
+
+    const query = `SELECT * FROM ${table}`;
+    console.log(query);
+
+    db.all(query, (error, rows) => {
+        if (error) {
+            response.status(500).send('Internal server error');
+        } else {
+            response.status(200).send(rows);
+        }
+
+        closeDatabase(db);
+    });
+};
+
+/**
+ * Create new tables if they do not already exist in sqlite3 database
+ * 
+ * @param {response} response - providing feedback to user
+ */
+const createDefaultTables = (response) => {
+    const db = openDatabase();
+
+    const createCareersTableQuery = `
+        CREATE TABLE IF NOT EXISTS Careers (
+            id INTEGER PRIMARY KEY,
+            dates TEXT,
+            company TEXT,
+            role TEXT,
+            description TEXT
+        );`;
+
+    const createAchievementsTableQuery = `
+        CREATE TABLE IF NOT EXISTS Achievements (
+            id INTEGER PRIMARY KEY,
+            date TEXT,
+            type TEXT
+        );`;
+
+    const createRepositoriesTableQuery = `
+        CREATE TABLE IF NOT EXISTS Repositories (
+            id INTEGER PRIMARY KEY,
+            name TEXT,
+            languages TEXT,
+            description TEXT
+        );`;
+
+    db.serialize(() => {
+        db.run(createCareersTableQuery, handleRunError);
+        db.run(createAchievementsTableQuery, handleRunError);
+        db.run(createRepositoriesTableQuery, handleRunError);
+        closeDatabase(db);
+    });
+
+    // Send success feedback to user
+    response.status(200).send('Successfully executed table creation: Careers, Achievements, Repositories.');
 };
 
 /**
  * Insert request's body into database and use response to give feedback
  * 
  * @param {object} requestBody - Request's data/body containing table and relevant content to table
- * @param {object} response - Response is taken from express's default parameter
- * @returns {response} - Feedback on the requestor's request
+ * @param {object} response - Response is taken from express's default parameter to provde feedback to requester
  */
 const insertEntry = (requestBody, response) => {
     try {
@@ -17,34 +87,46 @@ const insertEntry = (requestBody, response) => {
             response.status(400).send('Bad request.');
         }
 
+        const db = openDatabase();
+        let insertQuery;
+
         switch (table) {
             case 'careers':
-                db.run(
-                    `INSERT INTO Careers (dates, company, role, description)
-                    VALUES (${requestBody.dates}, ${requestBody.company},
-                        ${requestBody.role}, ${requestBody.description});`,
-                    handleRunError
-                );
+                insertQuery = `
+                    INSERT INTO Careers (dates, company, role, description)
+                    VALUES ('${requestBody.dates}', '${requestBody.company}',
+                        '${requestBody.role}', '${requestBody.description}');`;
                 break;
+
             case 'achievements':
-                db.run(
-                    `INSERT INTO Achievements (date, type)
-                    VALUES (${requestBody.date}, ${requestBody.type})`,
-                    handleRunError
-                );
+                insertQuery = `
+                    INSERT INTO Achievements (date, type)
+                    VALUES ('${requestBody.date}', '${requestBody.type}')`;
                 break;
+
             case 'repositories':
-                db.run(
-                    `INSERT INTO Repositories (name, languages, description)
-                    VALUES (${requestBody.name}, ${requestBody.languages},
-                        ${requestBody.description})`,
-                    handleRunError
-                );
+                insertQuery = `
+                    INSERT INTO Repositories (name, languages, description)
+                    VALUES ('${requestBody.name}', '${requestBody.languages}',
+                        '${requestBody.description}')`;
                 break;
+
             default:
+                closeDatabase(db);
                 response.status(400).send('Bad request.');
         }
-        response.status(200).send(`Successfully added entry to table ${table}.`);
+
+        db.run(insertQuery, (error) => {
+            if (error) {
+                handleRunError(error);
+                response.status(500).send('Internal server error');
+            } else {
+                response.status(200).send(`Successfully added entry to table ${table}.`);
+            }
+
+            // Callback
+            closeDatabase(db);
+        });
     } catch (error) {
         response.status(400).send('Bad request.');
     }
@@ -55,10 +137,8 @@ const insertEntry = (requestBody, response) => {
  * request's body to execute update and lastly use the response to provide
  * feedback to the requester.
  * 
- * @param {object} objectWithUpdate - object containing id, request's body and response
- * @returns {response} - provide feedback to requester
+ * @param {object} objectWithUpdate - object containing id, request's body and response to use in sqlite3 query
  */
-// const updateEntry = (id, requestBody, response) => {
 const updateEntry = (objectWithUpdate) => {
     try {
         const id = objectWithUpdate.id;
@@ -70,258 +150,325 @@ const updateEntry = (objectWithUpdate) => {
             response.status(400).send('Bad request.');
         }
 
+        const db = openDatabase();
+        let updateQuery;
+
         switch (table) {
             case 'careers':
                 if (requestBody.dates && requestBody.company && requestBody.role && requestBody.description) {
-                    db.run(
-                        `UPDATE Careers
+                    updateQuery = `
+                        UPDATE Careers
                         SET
-                          dates = '${requestBody.dates}',
-                          company = '${requestBody.company}',
-                          role = '${requestBody.role}',
-                          description = '${requestBody.description}'
-                        WHERE id = ${id};`,
-                        handleRunError);
+                            dates = '${requestBody.dates}',
+                            company = '${requestBody.company}',
+                            role = '${requestBody.role}',
+                            description = '${requestBody.description}'
+                        WHERE id = ${id};`;
                     break;
                 } else if (requestBody.dates && requestBody.company && requestBody.role) {
-                    db.run(
-                        `UPDATE Careers
+                    updateQuery = `
+                        UPDATE Careers
                         SET
-                          dates = '${requestBody.dates}',
-                          company = '${requestBody.company}',
-                          role = '${requestBody.role}'
-                        WHERE id = ${id};`,
-                        handleRunError);
+                            dates = '${requestBody.dates}',
+                            company = '${requestBody.company}',
+                            role = '${requestBody.role}'
+                        WHERE id = ${id};`;
                     break;
                 } else if (requestBody.dates && requestBody.company && requestBody.description) {
-                    db.run(
-                        `UPDATE Careers
+                    updateQuery = `
+                        UPDATE Careers
                         SET
-                          dates = '${requestBody.dates}',
-                          company = '${requestBody.company}',
-                          description = '${requestBody.description}'
-                        WHERE id = ${id};`,
-                        handleRunError);
+                            dates = '${requestBody.dates}',
+                            company = '${requestBody.company}',
+                            description = '${requestBody.description}'
+                        WHERE id = ${id};`;
                     break;
                 } else if (requestBody.dates && requestBody.role && requestBody.description) {
-                    db.run(
-                        `UPDATE Careers
+                    updateQuery = `
+                        UPDATE Careers
                         SET
-                          dates = '${requestBody.dates}',
-                          role = '${requestBody.role}',
-                          description = '${requestBody.description}'
-                        WHERE id = ${id};`,
-                        handleRunError);
+                            dates = '${requestBody.dates}',
+                            role = '${requestBody.role}',
+                            description = '${requestBody.description}'
+                        WHERE id = ${id};`;
                     break;
                 } else if (requestBody.company && requestBody.role && requestBody.description) {
-                    db.run(
-                        `UPDATE Careers
+                    updateQuery = `
+                        UPDATE Careers
                         SET
-                          company = '${requestBody.company}',
-                          role = '${requestBody.role}',
-                          description = '${requestBody.description}'
-                        WHERE id = ${id};`,
-                        handleRunError);
+                            company = '${requestBody.company}',
+                            role = '${requestBody.role}',
+                            description = '${requestBody.description}'
+                        WHERE id = ${id};`;
                     break;
                 } else if (requestBody.dates && requestBody.company) {
-                    db.run(
-                        `UPDATE Careers
+                    updateQuery = `
+                        UPDATE Careers
                         SET
-                          dates = '${requestBody.dates}',
-                          company = '${requestBody.company}'
-                        WHERE id = ${id};`,
-                        handleRunError);
+                            dates = '${requestBody.dates}',
+                            company = '${requestBody.company}'
+                        WHERE id = ${id};`;
                     break;
                 } else if (requestBody.dates && requestBody.role) {
-                    db.run(
-                        `UPDATE Careers
+                    updateQuery = `
+                        UPDATE Careers
                         SET
-                          dates = '${requestBody.dates}',
-                          role = '${requestBody.role}'
-                        WHERE id = ${id};`,
-                        handleRunError);
+                            dates = '${requestBody.dates}',
+                            role = '${requestBody.role}'
+                        WHERE id = ${id};`;
                     break;
                 } else if (requestBody.dates && requestBody.description) {
-                    db.run(
-                        `UPDATE Careers
+                    updateQuery = `
+                        UPDATE Careers
                         SET
-                          dates = '${requestBody.dates}',
-                          description = '${requestBody.description}'
-                        WHERE id = ${id};`,
-                        handleRunError);
+                            dates = '${requestBody.dates}',
+                            description = '${requestBody.description}'
+                        WHERE id = ${id};`;
                     break;
                 } else if (requestBody.company && requestBody.role) {
-                    db.run(
-                        `UPDATE Careers
+                    updateQuery = `
+                        UPDATE Careers
                         SET
-                          company = '${requestBody.company}',
-                          role = '${requestBody.role}'
-                        WHERE id = ${id};`,
-                        handleRunError);
+                            company = '${requestBody.company}',
+                            role = '${requestBody.role}'
+                        WHERE id = ${id};`;
                     break;
                 } else if (requestBody.company && requestBody.description) {
-                    db.run(
-                        `UPDATE Careers
+                    updateQuery = `
+                        UPDATE Careers
                         SET
-                          company = '${requestBody.company}',
-                          description = '${requestBody.description}'
-                        WHERE id = ${id};`,
-                        handleRunError);
+                            company = '${requestBody.company}',
+                            description = '${requestBody.description}'
+                        WHERE id = ${id};`;
                     break;
                 } else if (requestBody.role && requestBody.description) {
-                    db.run(
-                        `UPDATE Careers
+                    updateQuery = `
+                        UPDATE Careers
                         SET
-                          role = '${requestBody.role}',
-                          description = '${requestBody.description}'
-                        WHERE id = ${id};`,
-                        handleRunError);
+                            role = '${requestBody.role}',
+                            description = '${requestBody.description}'
+                        WHERE id = ${id};`;
                     break;
                 } else if (requestBody.dates) {
-                    db.run(
-                        `UPDATE Careers
+                    updateQuery = `
+                        UPDATE Careers
                         SET
-                          dates = '${requestBody.dates}'
-                        WHERE id = ${id};`,
-                        handleRunError);
+                            dates = '${requestBody.dates}'
+                        WHERE id = ${id};`;
                     break;
                 } else if (requestBody.company) {
-                    db.run(
-                        `UPDATE Careers
+                    updateQuery = `
+                        UPDATE Careers
                         SET
-                          company = '${requestBody.company}'
-                        WHERE id = ${id};`,
-                        handleRunError);
+                            company = '${requestBody.company}'
+                        WHERE id = ${id};`;
                     break;
                 } else if (requestBody.role) {
-                    db.run(
-                        `UPDATE Careers
+                    updateQuery = `
+                        UPDATE Careers
                         SET
-                          role = '${requestBody.role}'
-                        WHERE id = ${id};`,
-                        handleRunError);
+                            role = '${requestBody.role}'
+                        WHERE id = ${id};`;
                     break;
                 } else if (requestBody.description) {
-                    db.run(
-                        `UPDATE Careers
+                    updateQuery = `
+                        UPDATE Careers
                         SET
-                          description = '${requestBody.description}'
-                        WHERE id = ${id};`,
-                        handleRunError);
+                            description = '${requestBody.description}'
+                        WHERE id = ${id};`;
                     break;
                 } else {
+                    closeDatabase(db);
                     response.status(400).send('Bad request.');
-                    break;
+                    return;
                 }
 
             case 'achievements':
                 if (requestBody.date && requestBody.type) {
-                    db.run(
-                        `UPDATE Achievements
+                    updateQuery = `
+                        UPDATE Achievements
                         SET
-                          date = '${requestBody.date}',
-                          type = '${requestBody.type}'
-                        WHERE id = ${id};`,
-                        handleRunError);
+                            date = '${requestBody.date}',
+                            type = '${requestBody.type}'
+                        WHERE id = ${id};`;
                     break;
                 } else if (requestBody.date) {
-                    db.run(
-                        `UPDATE Achievements
+                    updateQuery = `
+                        UPDATE Achievements
                         SET
-                          date = '${requestBody.date}'
-                        WHERE id = ${id};`,
-                        handleRunError);
+                            date = '${requestBody.date}'
+                        WHERE id = ${id};`;
                     break;
                 } else if (requestBody.type) {
-                    db.run(
-                        `UPDATE Achievements
+                    updateQuery = `
+                        UPDATE Achievements
                         SET
-                          type = '${requestBody.type}'
-                        WHERE id = ${id};`,
-                        handleRunError);
+                            type = '${requestBody.type}'
+                        WHERE id = ${id};`;
                     break;
                 } else {
+                    closeDatabase(db);
                     response.status(400).send('Bad request.');
-                    break;
+                    return;
                 }
 
             case 'repositories':
                 if (requestBody.name && requestBody.languages && requestBody.description) {
-                    db.run(
-                        `UPDATE Repositories
+                    updateQuery = `
+                        UPDATE Repositories
                         SET
-                          name = '${requestBody.name}',
-                          languages = '${requestBody.languages}',
-                          description = '${requestBody.description}'
-                        WHERE id = ${id};`,
-                        handleRunError);
+                            name = '${requestBody.name}',
+                            languages = '${requestBody.languages}',
+                            description = '${requestBody.description}'
+                        WHERE id = ${id};`;
                     break;
                 } else if (requestBody.name && requestBody.languages) {
-                    db.run(
-                        `UPDATE Repositories
+                    updateQuery = `
+                        UPDATE Repositories
                         SET
-                          name = '${requestBody.name}',
-                          languages = '${requestBody.languages}'
-                        WHERE id = ${id};`,
-                        handleRunError);
+                            name = '${requestBody.name}',
+                            languages = '${requestBody.languages}'
+                        WHERE id = ${id};`;
                     break;
                 } else if (requestBody.name && requestBody.description) {
-                    db.run(
-                        `UPDATE Repositories
+                    updateQuery = `
+                        UPDATE Repositories
                         SET
-                          name = '${requestBody.name}',
-                          description = '${requestBody.description}'
-                        WHERE id = ${id};`,
-                        handleRunError);
+                            name = '${requestBody.name}',
+                            description = '${requestBody.description}'
+                        WHERE id = ${id};`;
                     break;
                 } else if (requestBody.languages && requestBody.description) {
-                    db.run(
-                        `UPDATE Repositories
+                    updateQuery = `
+                        UPDATE Repositories
                         SET
-                          languages = '${requestBody.languages}',
-                          description = '${requestBody.description}'
-                        WHERE id = ${id};`,
-                        handleRunError);
+                            languages = '${requestBody.languages}',
+                            description = '${requestBody.description}'
+                        WHERE id = ${id};`;
                     break;
                 } else if (requestBody.name) {
-                    db.run(
-                        `UPDATE Repositories
+                    updateQuery = `
+                        UPDATE Repositories
                         SET
-                          name = '${requestBody.name}'
-                        WHERE id = ${id};`,
-                        handleRunError);
+                            name = '${requestBody.name}'
+                        WHERE id = ${id};`;
                     break;
                 } else if (requestBody.languages) {
-                    db.run(
-                        `UPDATE Repositories
+                    updateQuery = `
+                        UPDATE Repositories
                         SET
-                          languages = '${requestBody.languages}',
-                        WHERE id = ${id};`,
-                        handleRunError);
+                            languages = '${requestBody.languages}',
+                        WHERE id = ${id};`;
                     break;
                 } else if (requestBody.description) {
-                    db.run(
-                        `UPDATE Repositories
+                    updateQuery = `
+                        UPDATE Repositories
                         SET
-                          description = '${requestBody.description}'
-                        WHERE id = ${id};`,
-                        handleRunError);
+                            description = '${requestBody.description}'
+                        WHERE id = ${id};`;
                     break;
                 } else {
+                    closeDatabase(db);
                     response.status(400).send('Bad request.');
-                    break;
+                    return;
                 }
+
             default:
+                closeDatabase(db);
                 response.status(400).send('Bad request.');
+                return;
         }
+
+        db.run(updateQuery, (error) => {
+            if (error) {
+                handleRunError(error);
+            }
+
+            closeDatabase(db);
+            response.status(200).send(`Successfully updated entry in table ${table}`);
+        });
     } catch (error) {
+        closeDatabase(db);
         response.status(400).send('Bad request.');
     }
+};
 
-    response.status(200).send(`Successfully updated entry in table ${table}`);
+/**
+ * Remove an entry in sqlite3 database based on provided id and table from requester
+ * 
+ * @param {object} entryToRemove - contains id, table and response to use in sqlite3 query
+ */
+const removeEntryById = (entryToRemove) => {
+    const db = openDatabase();
+
+    const id = entryToRemove.id;
+    const table = entryToRemove.table;
+    const response = entryToRemove.response;
+
+    // Query the database to check if the item with the given ID exists
+    db.get(`SELECT * FROM ${table} WHERE id = ${id}`, (error, row) => {
+        if (error) {
+            return response.status(500).send('Internal server error');
+        }
+
+        if (!row) {
+            return response.status(404).send('Item not found.');
+        }
+
+        // If the record exists, delete it from the database
+        db.run(`DELETE FROM items WHERE id = ${id}`, (error) => {
+            if (error) {
+                return response.status(500).send('Internal server error');
+            }
+
+            closeDatabase(db);
+            response.status(200).send(`Successfully removed entry from table ${table}.`);
+        });
+    });
+};
+
+/**
+ * Check if requester's id exists in table and returns boolean based on result
+ * 
+ * @param {object} objectWithUpdate - contains id, request body (with table) and response from request
+ * @returns {boolean} - based on whether id was found in table or not
+ */
+const idExistsInTable = (objectWithUpdate) => {
+    const db = openDatabase();
+    const id = objectWithUpdate.id;
+    const table = objectWithUpdate.requestBody.table;
+    const response = objectWithUpdate.response;
+    let foundId = false;
+
+    db.get(`SELECT * FROM ${table} WHERE id = ${id}`, (error, row) => {
+        if (error) {
+            closeDatabase(db);
+            response.status(500).send('Internal server error.');
+            foundId = false;
+        }
+
+        if (!row) {
+            closeDatabase(db);
+            response.status(404).send('Item not found.');
+            foundId = false;
+        } else {
+            closeDatabase(db);
+            foundId = true;
+        }
+    });
+
+    if (foundId) {
+        return true;
+    } else {
+        return false;
+    }
 };
 
 module.exports = {
+    retrieveDataFromTable,
+    createDefaultTables,
     insertEntry,
-    updateEntry
+    updateEntry,
+    removeEntryById,
+    idExistsInTable,
 };

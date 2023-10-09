@@ -13,9 +13,9 @@ const express = require('express');
 const path = require('path');
 
 // Imports
-const db = require('./data/database.js');
 const { authenticate } = require('./data/helpers.js');
-const { insertEntry, updateEntry } = require('./data/databaseHelpers.js');
+const { retrieveDataFromTable, createDefaultTables, insertEntry, updateEntry,
+    removeEntryById, idExistsInTable } = require('./data/databaseHelpers.js');
 
 const app = express();
 const port = process.env.PORT || 3000; // Use the port provided by the environment or default to 3000
@@ -26,115 +26,80 @@ app.use(express.static(path.join(__dirname, 'public')));
 // Parse incoming JSON data in the request body
 app.use(express.json());
 
+/*
+[ WORKING ]
+curl "http://localhost:3000/ping"
+*/
 app.get('/ping', (request, response) => {
     response.status(200).send('Pong!');
 });
 
+/*
+[ WORKING ]
+curl "http://localhost:3000/retrieve/Careers"
+curl "http://localhost:3000/retrieve/Achievements"
+curl "http://localhost:3000/retrieve/Repositories"
+*/
 app.get('/retrieve/:table', (request, response) => {
-    const table = request.params.word;
+    const table = request.params.table;
 
-    db.all(`SELECT * FROM ${table}`, (error, rows) => {
-        if (error) {
-            // Handle database error
-            return response.status(500).send('Internal server error');
-        }
+    console.log('Requesting on table:', table);
 
-        // Respond with the rows retrieved from the database
-        response.status(200).json(rows);
-    });
-});
-
-app.get('/create', authenticate, (request, response) => {
-    // Create default tables
-    db.run(
-        `CREATE TABLE IF NOT EXISTS Careers (
-        id INTEGER PRIMARY KEY,
-        dates TEXT,
-        company TEXT,
-        role TEXT,
-        description TEXT
-    );`, error => {
-        response.status(500).send('An error occurred creating Careers table:', error);
-    });
-
-    db.run(
-        `CREATE TABLE IF NOT EXISTS Achievements (
-        id INTEGER PRIMARY KEY,
-        date TEXT,
-        type TEXT
-    );`, error => {
-        response.status(500).send('An error occurred creating Achievements table:', error);
-    });
-
-    db.run(
-        `CREATE TABLE IF NOT EXISTS Repositories (
-        id INTEGER PRIMARY KEY,
-        name TEXT,
-        languages TEXT,
-        description TEXT
-    );`, error => {
-        response.status(500).send('An error occurred creating Repositories table:', error);
-    });
-
-    response.status(200).send('Successfully executed tables: Careers, Achievements, Repositories.');
+    retrieveDataFromTable(table, response);
 });
 
 /*
-curl -X POST -H "Authorization: 123 123" -H "Content-Type: application/json" -d "{\"table\":\"careers\",\"testing\":\"y'\u0027es\"}" "https://abrie.glitch.me/add"
+[ WORKING ]
+curl -H "Authorization: 123 123" -H "Content-Type: application/json" "http://localhost:3000/create"
+*/
+app.get('/create', authenticate, (request, response) => {
+    createDefaultTables(response);
+});
+
+/*
+[ WORKING ]
+curl -X POST -H "Authorization: 123 123" -H "Content-Type: application/json" -d "{\"table\":\"Careers\",\"dates\": \"2023-10-10\", \"company\": \"Example Corp\", \"role\": \"Software Engineer\", \"description\": \"Working on exciting projects\"}" "http://localhost:3000/add"
+curl -X POST -H "Authorization: 123 123" -H "Content-Type: application/json" -d "{\"table\":\"Achievements\",\"date\": \"2023-10-10\", \"type\": \"Example Corp\"}" "http://localhost:3000/add"
+curl -X POST -H "Authorization: 123 123" -H "Content-Type: application/json" -d "{\"table\":\"Repositories\",\"name\": \"2023-10-10\", \"languages\": \"Example Corp, Example Corp, Example Corp\", \"description\": \"Software Engineer\"}" "http://localhost:3000/add"
 */
 app.post('/add', (request, response) => {
     insertEntry(request.body, response);
 });
 
+/*
+[ TESTING ]
+curl -X PUT -H "Authorization: 123 123" -H "Content-Type: application/json" -d "{\"table\":\"Achievements\",\"date\": \"test1\", \"type\": \"test1\"}" "http://localhost:3000/edit/1"
+curl -X PUT -H "Authorization: 123 123" -H "Content-Type: application/json" -d "{\"table\":\"Achievements\",\"date\": \"test2\"}" "http://localhost:3000/edit/1"
+curl -X PUT -H "Authorization: 123 123" -H "Content-Type: application/json" -d "{\"table\":\"Achievements\",\"type\": \"test3\"}" "http://localhost:3000/edit/1"
+*/
 app.put('/edit/:id', authenticate, (request, response) => {
-    const idToUpdate = parseInt(request.params.id);
-    const entryWithUpdate = request.body;
-
-    // Query the database to check if the item with the given ID exists
-    db.get(`SELECT * FROM ${entryWithUpdate.table} WHERE id = ${idToUpdate}`, (err, row) => {
-        if (err) {
-            // Handle database error
-            return response.status(500).send('Internal server error.');
-        }
-
-        if (!row) {
-            // If no record is found, respond with a 404 status
-            return response.status(404).send('Item not found.');
-        }
-    });
-
     const objectWithUpdate = {
-        id: idToUpdate,
-        requestBody: entryWithUpdate,
+        id: parseInt(request.params.id),
+        requestBody: request.body,
         response: response,
     };
 
-    updateEntry(objectWithUpdate);
+    // Query the database to check if the item with the given ID exists
+    if (!idExistsInTable(objectWithUpdate)) {
+        console.log('test:',idExistsInTable(objectWithUpdate));
+        return;
+    }
+
+    // updateEntry(objectWithUpdate);
 });
 
+/*
+[ TESTING ]
+curl "http://localhost:3000/ping/"
+*/
 app.delete('/remove/:id', authenticate, (request, response) => {
-    const itemId = request.params.id;
-    const table = request.body.table;
+    const entryToRemove = {
+        id: request.params.id,
+        table: request.body.table,
+        response: response,
+    };
 
-    // Query the database to check if the item with the given ID exists
-    db.get(`SELECT * FROM ${table} WHERE id = ${itemId}`, (err, row) => {
-        if (err) {
-            return response.status(500).send('Internal server error');
-        }
-
-        if (!row) {
-            return response.status(404).send('Item not found.');
-        }
-
-        // If the record exists, delete it from the database
-        db.run(`DELETE FROM items WHERE id = ${itemId}`, (err) => {
-            if (err) {
-                return response.status(500).send('Internal server error');
-            }
-
-            response.status(200).send(`Successfully removed entry from table ${table}.`);
-        });
-    });
+    removeEntryById(entryToRemove);
 });
 
 // Start the server
