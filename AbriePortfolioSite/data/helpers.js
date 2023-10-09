@@ -11,8 +11,7 @@ const authenticate = (request, response, next) => {
     const [key, secret] = authHeader.split(' ');
 
     // Check if the key and secret match the expected values
-    // if (key === process.env.KEY && secret === process.env.SECRET) {
-    if (key === '123' && secret === '123') {
+    if (key === process.env.KEY && secret === process.env.SECRET) {
         // Authentication successful
         next();
     } else {
@@ -21,6 +20,19 @@ const authenticate = (request, response, next) => {
     }
 };
 
+// Middleware to check origin and header
+const checkHeader = (request, response, next) => {
+    const requiredHeader = 'Same-Origin';
+
+    // Check if the request is from the allowed domain
+    if (request.get('Request-Origin-Header') === requiredHeader) {
+        next(); // Continue to the next middleware or route handler
+    } else {
+        response.status(403).send('Forbidden'); // Not allowed
+    }
+};
+
 module.exports = {
-    authenticate
+    authenticate,
+    checkHeader,
 };

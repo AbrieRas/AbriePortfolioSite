@@ -16,9 +16,7 @@ const handleRunError = (error) => {
  */
 const retrieveDataFromTable = (table, response) => {
     const db = openDatabase();
-
     const query = `SELECT * FROM ${table}`;
-    console.log(query);
 
     db.all(query, (error, rows) => {
         if (error) {
@@ -379,13 +377,30 @@ const updateEntry = (objectWithUpdate) => {
                 return;
         }
 
-        db.run(updateQuery, (error) => {
-            if (error) {
-                handleRunError(error);
-            }
+        const getByIdQuery = `SELECT * FROM ${table} WHERE id = ${id}`;
 
-            closeDatabase(db);
-            response.status(200).send(`Successfully updated entry in table ${table}`);
+        db.get(getByIdQuery, (error, row) => {
+            if (error) {
+                closeDatabase(db);
+                response.status(500).send('Internal server error.');
+                return;
+            }
+        
+            if (!row) {
+                closeDatabase(db);
+                response.status(404).send('Item not found.');
+            } else {
+                db.run(updateQuery, (error) => {
+                    if (error) {
+                        handleRunError(error);
+                        closeDatabase(db);
+                        response.status(500).send('Internal server error.');
+                    } else {
+                        closeDatabase(db);
+                        response.status(200).send(`Successfully updated entry in table ${table}`);
+                    }
+                });
+            }
         });
     } catch (error) {
         closeDatabase(db);
@@ -400,68 +415,36 @@ const updateEntry = (objectWithUpdate) => {
  */
 const removeEntryById = (entryToRemove) => {
     const db = openDatabase();
-
     const id = entryToRemove.id;
     const table = entryToRemove.table;
     const response = entryToRemove.response;
+    const getByIdQuery = `SELECT * FROM ${table} WHERE id = ${id}`;
+    const deleteByIdQuery = `DELETE FROM ${table} WHERE id = ${id}`;
 
     // Query the database to check if the item with the given ID exists
-    db.get(`SELECT * FROM ${table} WHERE id = ${id}`, (error, row) => {
+    db.get(getByIdQuery, (error, row) => {
         if (error) {
-            return response.status(500).send('Internal server error');
+            closeDatabase(db);
+            response.status(500).send('Internal server error');
+            return;
         }
 
         if (!row) {
+            closeDatabase(db);
             return response.status(404).send('Item not found.');
-        }
-
-        // If the record exists, delete it from the database
-        db.run(`DELETE FROM items WHERE id = ${id}`, (error) => {
-            if (error) {
-                return response.status(500).send('Internal server error');
-            }
-
-            closeDatabase(db);
-            response.status(200).send(`Successfully removed entry from table ${table}.`);
-        });
-    });
-};
-
-/**
- * Check if requester's id exists in table and returns boolean based on result
- * 
- * @param {object} objectWithUpdate - contains id, request body (with table) and response from request
- * @returns {boolean} - based on whether id was found in table or not
- */
-const idExistsInTable = (objectWithUpdate) => {
-    const db = openDatabase();
-    const id = objectWithUpdate.id;
-    const table = objectWithUpdate.requestBody.table;
-    const response = objectWithUpdate.response;
-    let foundId = false;
-
-    db.get(`SELECT * FROM ${table} WHERE id = ${id}`, (error, row) => {
-        if (error) {
-            closeDatabase(db);
-            response.status(500).send('Internal server error.');
-            foundId = false;
-        }
-
-        if (!row) {
-            closeDatabase(db);
-            response.status(404).send('Item not found.');
-            foundId = false;
         } else {
-            closeDatabase(db);
-            foundId = true;
+            // If the record exists, delete it from the database
+            db.run(deleteByIdQuery, (error) => {
+                if (error) {
+                    closeDatabase(db);
+                    return response.status(500).send('Internal server error');
+                } else {
+                    closeDatabase(db);
+                    response.status(200).send(`Successfully removed entry from table ${table}.`);
+                }
+            });
         }
     });
-
-    if (foundId) {
-        return true;
-    } else {
-        return false;
-    }
 };
 
 module.exports = {
@@ -470,5 +453,4 @@ module.exports = {
     insertEntry,
     updateEntry,
     removeEntryById,
-    idExistsInTable,
 };
