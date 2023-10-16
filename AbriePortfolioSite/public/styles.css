@@ -195,6 +195,10 @@ img.icon {
     display: inline-flex;
 }
 
+.repository-entry-header > div.column-right {
+    width: 15%;
+}
+
 .repository-entry-header > div.column-right > ul {
     margin-top: 0%;
 }
