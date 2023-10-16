@@ -6,6 +6,7 @@ div.theme-button {
     margin: 5%;
     width: 16%;
     padding: 25px;
+    word-wrap: break-word;
     background-color: #aff8a2;
     transition: background-color 0.5s;
     font-weight: bold;
@@ -14,7 +15,9 @@ div.theme-button {
 }
 
 div.theme-button:hover,
-div.theme-button:focus {
+div.theme-button:focus,
+#submit.active:hover,
+#submit.active:focus {
     background-color: #ffffff;
     cursor: pointer;
 }
@@ -148,6 +151,7 @@ img.icon {
 
 /* Career styles */
 .career-entry > div.column-right {
+    width: 45%;
     max-width: 45%;
     margin-right: 5%;
 }
@@ -174,6 +178,11 @@ img.icon {
 
 .repository-entry:last-child {
     margin-bottom: 0%;
+}
+
+.repository-entry .column-left {
+    font-weight: bold;
+    font-size: 20px;
 }
 
 .repository-entry-header {
@@ -235,9 +244,35 @@ textarea#message {
     margin-bottom: 5%;
 }
 
+#email.touched {
+    border-color: #bdbcbc;
+}
+
+#email.invalid {
+    background-color: #ffeded;
+    border-color: #da5252;
+}
+
 #submit {
+    text-align: center;
+    border: 2px solid black;
+    border-radius: 10px;
     margin: 0% auto;
     width: 80%;
+    padding: 25px;
+    word-wrap: break-word;
+    font-weight: bold;
+    color: #000000;
+    cursor: default;
+    background-color: gray;
+    color: #ffffff;
+    transition: background-color 0.5s;
+}
+
+#submit.active {
+    background-color: #aff8a2;
+    color: #000000;
+    box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
 }
 
 /* Footer styles */
@@ -250,6 +285,7 @@ textarea#message {
 
 #footer > div.column > div {
     background-color: #f2f2f2;
+    word-wrap: break-word;
     padding: 10px;
     margin: 5px;
     border: 1px solid #ccc;

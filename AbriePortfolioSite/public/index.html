@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        <title>Abrie Portfolio Site</title>
+        <title>Abrie's Portfolio Site</title>
         <link rel="stylesheet" href="./styles.css">
         <!-- Vue -->
         <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js" defer></script>
@@ -11,6 +11,7 @@
         <script src="./Repository.js" defer></script>
         <!-- app.js -->
         <script src="./app.js" defer></script>
+        <script src="./source.js" defer></script>
     </head>
 
     <body>
@@ -19,7 +20,7 @@
 
             <div id="header">
                 <div class="column-left">
-                    <div><img class="icon" src="./Resources/user-regular.svg"/> <strong>Abrie Ras</strong></div>
+                    <div><img class="icon" src="https://cdn.glitch.global/499fb8d5-afc7-4414-a2d2-c90b9cb101fe/user-regular.svg?v=1696875570458"/> <strong>Abrie Ras</strong></div>
                 </div>
 
                 <div class="column-right">
@@ -36,7 +37,7 @@
             <div id="content">
                 <div id="intro">
                     <div id="title"><h1>Full Stack Developer</h1></div>
-                    <div><img src="./Resources/Self.bmp"/></div>
+                    <div><img src="https://cdn.glitch.global/499fb8d5-afc7-4414-a2d2-c90b9cb101fe/Self.bmp?v=1696875569859"/></div>
                     <div id="about-title"><h3>About me</h3></div>
                     <div><p>I am a dedicated software engineer, specializing in full-stack web development. 
                         With a track record of delivering high-quality service and a passion for technology, 
@@ -56,21 +57,11 @@
                     <h1>Career</h1>
 
                     <career
-                        v-for="career in careers"
+                        v-for="career in careers" :key="career.id"
                         v-bind:dates="career.dates"
                         v-bind:company="career.company"
                         v-bind:role="career.role"
                         v-bind:description="career.description"></career>
-
-                    <!-- <div class="career-entry">
-                        <div class="column-left">
-                            <h3>(May 2021 - Current)</h3>
-                        </div>
-                        <div class="column-right">
-                            <h3>iVvy: Cloud-based Software Support Consultant</h3>
-                            <p>Assisting clients with business’ software via emails, calls, and meetings. This also includes template work (coding), project work, API support, and ADOK tasks.</p>
-                        </div>
-                    </div> -->
                 </div>
 
                 <hr/>
@@ -79,18 +70,9 @@
                     <h1>Achievements</h1>
 
                     <achievement
-                        v-for="achievement in achievements"
+                        v-for="achievement in achievements" :key="achievement.id"
                         v-bind:date="achievement.date"
                         v-bind:type="achievement.type"></achievement>
-
-                    <!-- <div class="achievement-entry">
-                        <div class="column-left">
-                            <h3>(12 Sept 2021)</h3>
-                        </div>
-                        <div class="column-right">
-                            <h3>Learn Node-SQLite Course - CodeCademy Certificate</h3>
-                        </div>
-                    </div> -->
                 </div>
 
                 <hr/>
@@ -99,29 +81,10 @@
                     <h1>Repositories</h1>
 
                     <repository
-                        v-for="repository in repositories"
+                        v-for="repository in repositories" :key="repository.id"
                         v-bind:name="repository.name"
                         v-bind:languages="repository.languages"
                         v-bind:description="repository.description"></repository>
-
-                    <!-- <div class="repository-entry">
-                        <div class="repository-entry-header">
-                            <div class="column-left">
-                                Abrie's Porfolio Site
-                            </div>
-                            <div class="column-right">
-                                <ul>
-                                    <li>HTML</li>
-                                    <li>CSS</li>
-                                    <li>JavaScript</li>
-                                    <li>Vue.js</li>
-                                </ul>
-                            </div>
-                        </div>
-                        <div>
-                            <p>Of on affixed civilly moments promise explain fertile in. Assurance advantage belonging happiness departure so of. Now improving and one sincerity intention allowance commanded not. Oh an am frankness be necessary earnestly advantage estimable extensive. Five he wife gone ye. Mrs suffering sportsmen earnestly any. In am do giving to afford parish settle easily garret.</p>
-                        </div>
-                    </div> -->
                 </div>
 
                 <hr/>
@@ -131,26 +94,26 @@
                     <div id="get-in-touch-body">
                         <div class="column-left">
                             <div id="email-box">
-                                <div><img class="icon" src="./Resources/envelope-regular.svg"/> <strong>Email</strong></div>
+                                <div><img class="icon" src="https://cdn.glitch.global/499fb8d5-afc7-4414-a2d2-c90b9cb101fe/envelope-regular.svg?v=1696875565260"/> <strong>Email</strong></div>
                                 <div><a href="mailto:www.headoff.com@gmail.com?subject=Feedback on Abrie CV">www.headoff.com@gmail.com</a></div>
                             </div>
                             <div id="mobile-box">
-                                <div><img class="icon" src="./Resources/mobile-screen-button-solid.svg"/> <strong>Mobile</strong></div>
+                                <div><img class="icon" src="https://cdn.glitch.global/499fb8d5-afc7-4414-a2d2-c90b9cb101fe/mobile-screen-button-solid.svg?v=1696875567095"/> <strong>Mobile</strong></div>
                                 <div><a href="tel:27799489329" target="_blank">+27 79 948 9329</a></div>
                             </div>
                         </div>
-                        <form id="email-form" class="column-right" action="/email-message">
+                        <form id="email-form" class="column-right">
                             <div class="inner-column-left">
-                                <label for="name">Name</label>
-                                <input id="name" name="name" type="text" autocomplete="name" tabindex="1"/>
+                                <label for="name">Name *</label>
+                                <input id="name" name="name" type="text" autocomplete="name" tabindex="1" v-model.trim="name"/>
                                 
                                 <label for="email">Email *</label>
-                                <input id="email" name="email" type="text" autocomplete="email" tabindex="3"/>
+                                <input id="email" name="email" type="text" autocomplete="email" tabindex="3" v-model.trim="email" v-bind:class="[emailClasses]"/>
                             </div>
 
                             <div class="inner-column-right">
-                                <label for="surname">Surname</label>
-                                <input id="surname" name="surname" type="text" tabindex="2"/>
+                                <label for="surname">Surname *</label>
+                                <input id="surname" name="surname" type="text" tabindex="2" v-model.trim="surname"/>
                                 
                                 <label for="subject">Subject</label>
                                 <input id="subject" name="subject" type="text" tabindex="4"/>
@@ -159,7 +122,7 @@
                             <label for="message">Message</label>
                             <textarea id="message" name="message" tabindex="5"></textarea>
                             
-                            <div id="submit" class="theme-button" tabindex="6">Send</div>
+                            <div id="submit"  tabindex="6" v-bind:disabled="!formIsValid" v-bind:class="{ active: formIsValid }">Send</div>
                         </form>
                     </div>
                 </div>
@@ -169,23 +132,23 @@
 
             <div id="footer">
                 <div class="column">
-                    <div><img class="icon" src="./Resources/envelope-regular.svg"/> <strong>Email</strong></div>
+                    <div><img class="icon" src="https://cdn.glitch.global/499fb8d5-afc7-4414-a2d2-c90b9cb101fe/envelope-regular.svg?v=1696875565260"/> <strong>Email</strong></div>
                     <div><a href="mailto:www.headoff.com@gmail.com?subject=Feedback on Abrie CV">www.headoff.com@gmail.com</a></div>
                 </div>
 
                 <div class="column">
-                    <div><img class="icon" src="./Resources/mobile-screen-button-solid.svg"/> <strong>Mobile</strong></div>
+                    <div><img class="icon" src="https://cdn.glitch.global/499fb8d5-afc7-4414-a2d2-c90b9cb101fe/mobile-screen-button-solid.svg?v=1696875567095"/> <strong>Mobile</strong></div>
                     <div><a href="tel:27799489329" target="_blank">+27 79 948 9329</a></div>
                 </div>
 
                 <div class="column">
                     <div><strong>Social Media</strong></div>
-                    <div><img class="icon" src="./Resources/linkedin-in.svg"/> <a href="https://www.linkedin.com/in/abrie-ras/" target="_blank">LinkedIn</a></div>
+                    <div><img class="icon" src="https://cdn.glitch.global/499fb8d5-afc7-4414-a2d2-c90b9cb101fe/linkedin-in.svg?v=1696875566508"/> <a href="https://www.linkedin.com/in/abrie-ras/" target="_blank">LinkedIn</a></div>
                 </div>
 
                 <div class="column">
                     <div><strong>Coding Profiles</strong></div>
-                    <div><img class="icon" src="./Resources/github.svg"/> <a href="https://github.com/FlamingNightmare" target="_blank">GitHub</a></div>
+                    <div><img class="icon" src="https://cdn.glitch.global/499fb8d5-afc7-4414-a2d2-c90b9cb101fe/github.svg?v=1696875565950"/> <a href="https://github.com/FlamingNightmare" target="_blank">GitHub</a></div>
                     <div><a href="https://www.codecademy.com/profiles/AbrieRas" target="_blank">CodeCademy</a></div>
                 </div>
             </div>

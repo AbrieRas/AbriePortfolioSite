@@ -1,19 +1,21 @@
 [ GET ]
-curl -H "Request-Origin-Header: Same-Origin" "http://localhost:3000/ping"
-curl -H "Request-Origin-Header: Same-Origin" "http://localhost:3000/retrieve/Careers"
-curl -H "Request-Origin-Header: Same-Origin" "http://localhost:3000/retrieve/Achievements"
-curl -H "Request-Origin-Header: Same-Origin" "http://localhost:3000/retrieve/Repositories"
-curl -H "Authorization: 123 123" -H "Content-Type: application/json" "http://localhost:3000/create"
+curl -H "Request-Origin-Header: Same-Origin" "https://abrie.glitch.me/ping"
+curl -H "Request-Origin-Header: Same-Origin" "https://abrie.glitch.me/retrieve/Careers"
+curl -H "Request-Origin-Header: Same-Origin" "https://abrie.glitch.me/retrieve/Achievements"
+curl -H "Request-Origin-Header: Same-Origin" "https://abrie.glitch.me/retrieve/Repositories"
+curl -H "Authorization: 123 123" -H "Content-Type: application/json" "https://abrie.glitch.me/create"
 
 [ POST ]
-curl -X POST -H "Authorization: 123 123" -H "Content-Type: application/json" -d "{\"table\":\"Careers\",\"dates\": \"2023-10-10\", \"company\": \"Example Corp\", \"role\": \"Software Engineer\", \"description\": \"Working on exciting projects\"}" "http://localhost:3000/add"
-curl -X POST -H "Authorization: 123 123" -H "Content-Type: application/json" -d "{\"table\":\"Achievements\",\"date\": \"2023-10-10\", \"type\": \"Example Corp\"}" "http://localhost:3000/add"
-curl -X POST -H "Authorization: 123 123" -H "Content-Type: application/json" -d "{\"table\":\"Repositories\",\"name\": \"2023-10-10\", \"languages\": \"Example Corp, Example Corp, Example Corp\", \"description\": \"Software Engineer\"}" "http://localhost:3000/add"
+curl -X POST -H "Authorization: 123 123" -H "Content-Type: application/json" -d "{\"table\":\"Careers\",\"dates\": \"2023-10-10\", \"company\": \"Example Corp\", \"role\": \"Software Engineer\", \"description\": \"Working on exciting projects\"}" "https://abrie.glitch.me/add"
+curl -X POST -H "Authorization: 123 123" -H "Content-Type: application/json" -d "{\"table\":\"Achievements\",\"date\": \"2023-10-10\", \"type\": \"Example Corp\"}" "https://abrie.glitch.me/add"
+curl -X POST -H "Authorization: 123 123" -H "Content-Type: application/json" -d "{\"table\":\"Repositories\",\"name\": \"2023-10-10\", \"languages\": \"Example Corp, Example Corp, Example Corp\", \"description\": \"Software Engineer\"}" "https://abrie.glitch.me/add"
 
 [ PUT ]
-curl -X PUT -H "Authorization: 123 123" -H "Content-Type: application/json" -d "{\"table\":\"Achievements\",\"date\": \"test1\", \"type\": \"test1\"}" "http://localhost:3000/edit/1"
-curl -X PUT -H "Authorization: 123 123" -H "Content-Type: application/json" -d "{\"table\":\"Achievements\",\"date\": \"test2\"}" "http://localhost:3000/edit/1"
-curl -X PUT -H "Authorization: 123 123" -H "Content-Type: application/json" -d "{\"table\":\"Achievements\",\"type\": \"test3\"}" "http://localhost:3000/edit/1"
+curl -X PUT -H "Authorization: 123 123" -H "Content-Type: application/json" -d "{\"table\":\"Achievements\",\"date\": \"test1\", \"type\": \"test1\"}" "https://abrie.glitch.me/edit/1"
+curl -X PUT -H "Authorization: 123 123" -H "Content-Type: application/json" -d "{\"table\":\"Achievements\",\"date\": \"test2\"}" "https://abrie.glitch.me/edit/1"
+curl -X PUT -H "Authorization: 123 123" -H "Content-Type: application/json" -d "{\"table\":\"Achievements\",\"type\": \"test3\"}" "https://abrie.glitch.me/edit/1"
+curl -X PUT -H "Authorization: 123 123" -H "Content-Type: application/json" -d "{\"table\":\"Repositories\",\"languages\": \"Java, HTML, CSS, JavaScript\"}" "https://abrie.glitch.me/edit/2"
+curl -X PUT -H "Authorization: 123 123" -H "Content-Type: application/json" -d "{\"table\":\"Repositories\",\"name\": \"Online Book Reader\"}" "https://abrie.glitch.me/edit/7"
 
 [ DELETE ]
-curl -X DELETE -H "Authorization: 123 123" -H "Content-Type: application/json" -d "{\"table\":\"Careers\"}" "http://localhost:3000/remove/1"
+curl -X DELETE -H "Authorization: 123 123" -H "Content-Type: application/json" -d "{\"table\":\"Careers\"}" "https://abrie.glitch.me/remove/1"

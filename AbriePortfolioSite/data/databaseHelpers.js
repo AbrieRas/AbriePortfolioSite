@@ -16,7 +16,9 @@ const handleRunError = (error) => {
  */
 const retrieveDataFromTable = (table, response) => {
     const db = openDatabase();
-    const query = `SELECT * FROM ${table}`;
+    const query = `
+      SELECT * FROM ${table}
+      ORDER BY id DESC`;
 
     db.all(query, (error, rows) => {
         if (error) {
@@ -355,7 +357,7 @@ const updateEntry = (objectWithUpdate) => {
                     updateQuery = `
                         UPDATE Repositories
                         SET
-                            languages = '${requestBody.languages}',
+                            languages = '${requestBody.languages}'
                         WHERE id = ${id};`;
                     break;
                 } else if (requestBody.description) {
@@ -403,6 +405,9 @@ const updateEntry = (objectWithUpdate) => {
             }
         });
     } catch (error) {
+        const response = objectWithUpdate.response;
+        const db = openDatabase();
+
         closeDatabase(db);
         response.status(400).send('Bad request.');
     }

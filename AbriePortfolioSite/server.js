@@ -15,6 +15,7 @@ const path = require('path');
 const { authenticate, checkHeader } = require('./data/helpers.js');
 const { retrieveDataFromTable, createDefaultTables, insertEntry, updateEntry,
     removeEntryById, idExistsInTable } = require('./data/databaseHelpers.js');
+const { sendMail } = require('./data/mail');
 
 const app = express();
 const port = process.env.PORT || 3000; // Use the port provided by the environment or default to 3000
@@ -33,6 +34,26 @@ app.get('/retrieve/:table', checkHeader, (request, response) => {
     const table = request.params.table;
 
     retrieveDataFromTable(table, response);
+});
+
+app.post('/email-message', (request, response) => {
+  const requestBody = request.body;
+  
+  const mailData = {
+    from: requestBody.from,
+    to: process.env.MAIL_RECIPIENT,
+    subject: `CV Form: ${requestBody.subject}`,
+    html: `<h2>Full name: ${requestBody.fullName}</h2><p>${requestBody.message}</p>`,
+  };
+
+  try {
+    // Send email
+    sendMail(mailData);
+
+    response.status(200).send('Thank you for submitting your query!');
+  } catch (error) {
+    response.status(500).send('Internal server error');
+  }
 });
 
 app.get('/create', authenticate, (request, response) => {
