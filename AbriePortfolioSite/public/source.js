@@ -66,14 +66,38 @@ const formIsValid = () => {
     }
 };
 
+const sanitizeInput = (input) => {
+    // Create temp div
+    const tempElement = document.createElement('div');
+
+    // Escape special characters
+    tempElement.innerText = input;
+    const sanitized = tempElement.innerHTML
+        .trim()
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;")
+        .replace(/`/g, "&#96;");
+
+    // Remove temp div
+    tempElement.remove();
+    return sanitized;
+};
+
 const addSubmitButtonFunctionality = () => {
     document.getElementById('submit').addEventListener('click', () => {
         if (formIsValid()) {
+            const sanatizedName = sanitizeInput(`${sanitizeInput(document.getElementById('name').value)} ${sanitizeInput(document.getElementById('surname').value)}`);
+            const sanatizedEmail = sanitizeInput(document.getElementById('email').value);
+            const sanatizedSubject = sanitizeInput(document.getElementById('subject').value);
+            const sanatizedMessage = sanitizeInput(document.getElementById('message').value);
+
             const mailData = {
-                fullName: `${document.getElementById('name').value} ${document.getElementById('surname').value}`,
-                from: document.getElementById('email').value,
-                subject: document.getElementById('subject').value,
-                message: document.getElementById('message').value,
+                fullName: sanatizedName,
+                from: sanatizedEmail,
+                subject: sanatizedSubject,
+                message: sanatizedMessage,
             };
 
             fetch('/email-message', {
